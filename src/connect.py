@@ -7,12 +7,13 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_PORT = os.getenv("DB_PORT", 5439)
 
+#Here we define a class to handle database connections and operations
 
 class DatabaseConnector:
     def __init__(
@@ -32,7 +33,7 @@ class DatabaseConnector:
 
         logger.info("Attempting to connect to the database...")
         healthy_db = self.connect_to_db()
-
+        # Retry logic for database connection otherwise we got issues when the DB is not ready yet
         for _attempt in range(5):
             if healthy_db:
                 break

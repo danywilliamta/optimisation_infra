@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List
 
-
+#Here we define the schema for the LLM's output using Pydantic models
 class Anomaly(BaseModel):
     metric: str = Field(
         ..., description="Name of the problematic metric"
