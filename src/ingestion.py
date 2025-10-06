@@ -6,7 +6,7 @@ from connect import DatabaseConnector
 from dotenv import load_dotenv
 from openai import OpenAI
 from model import AnalysisResult
-
+import time
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -102,8 +102,8 @@ def save_to_db(metrics_object, analysis_object):
 
 
 if __name__ == "__main__":
-    connect = DatabaseConnector()
 
+    connect = DatabaseConnector()
     for file_path in get_json_files():
         metrics_object, analysis_object = process_json_file(file_path)
         save_to_db(metrics_object, analysis_object)

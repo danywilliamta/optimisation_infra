@@ -2,7 +2,7 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 import logging
-
+import time
 load_dotenv()
 
 logger = logging.getLogger(__name__)
@@ -31,8 +31,16 @@ class DatabaseConnector:
         self.connection = None
 
         logger.info("Attempting to connect to the database...")
+        healthy_db = self.connect_to_db()
 
-        self.connect_to_db()
+        for _attempt in range(5):
+            if healthy_db:
+                break
+            logger.warning(f"Database connection failed. Retrying in 5 seconds... (Attempt {_attempt + 1}/5)")
+            time.sleep(5)
+            healthy_db = self.connect_to_db()
+
+
         if self.connection and not self.table_exist():
             self.initialize_db()
 
@@ -48,6 +56,7 @@ class DatabaseConnector:
             )
             logger.info("Database connection established.")
             self.connection = conn
+            return True
         except Exception as e:
             logger.error(f"An error occurred while connecting to the database: {e}")
             return None
