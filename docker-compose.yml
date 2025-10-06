@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pg_local
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5434:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  ingestion:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ingestion_app
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    command: python3 ingestion.py
+    volumes:
+      - ./data_test:/app/data
+    networks:
+      - app_network
+
+volumes:
+  pg_data:
+
+networks:
+  app_network:
