@@ -6,7 +6,6 @@ from connect import DatabaseConnector
 from dotenv import load_dotenv
 from openai import OpenAI
 from model import AnalysisResult
-import time
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -24,6 +23,8 @@ def get_json_files(path=FILES_PATH):
 def generate_analyse_recommendation_batch(batch):
     log_metrics = json.dumps(batch, indent=2, default=float)
 
+    #Here we create a prompt for the LLM to analyze the batch of metrics
+
     prompt = f"""You are an infrastructure performance analyzer. 
     Given the following list of system metric snapshots (each item is one observation), do the following:
     1. Analyze the data and identify any anomalies or potential issues.
@@ -34,7 +35,7 @@ def generate_analyse_recommendation_batch(batch):
     System metrics:
     {log_metrics}
     """
-
+    # Call the LLM with the prompt, and model expected and parse the response into our Pydantic model
     response = client.responses.parse(
         model="gpt-4.1",
         input=[{"role": "user", "content": prompt}],
@@ -51,6 +52,7 @@ def generate_analyse_recommendation_batch(batch):
 
 
 def build_objects_for_db(analysis_result, original_batch):
+    # We build two JSON objects, one for the metrics and one for the analysis
     metrics_object = {
         "start_date": original_batch[0]["timestamp"],
         "end_date": original_batch[-1]["timestamp"],
@@ -71,6 +73,8 @@ def build_objects_for_db(analysis_result, original_batch):
 
 
 def process_json_file(filename, batch_size=os.getenv("BATCH_SIZE", 10)):
+    # Process a large JSON file in batches to avoid memory issues
+
     def process_batch(batch):
         logger.info(f"Processing batch of size {len(batch)}")
         analysis = generate_analyse_recommendation_batch(batch)
