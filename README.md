@@ -17,7 +17,7 @@ Le traitement se fait comme suit :
 
 Résultat:
 
-![alt text](image.png)
+![alt text](/result/image.png)
 
-![alt text](image-1.png)
+![alt text](/result/image-1.png)
 
